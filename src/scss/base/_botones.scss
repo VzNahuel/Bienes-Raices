@@ -2,6 +2,11 @@
     @include boton($amarillo);
 }
 
+.boton-amarillo-block{
+    @include boton($amarillo);
+    display: block;
+}
+
 .boton-verde{
     @include boton($verde);
 }

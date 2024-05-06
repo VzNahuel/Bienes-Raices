@@ -16,24 +16,35 @@
         margin: 0.5rem 0;
     }
 
-    .precio{
-        color: $verde;
-        font-weight: $bold;
-        font-size: 3rem;
-    }
-
     .contenido-anuncio{
         padding: 1rem;
     }
 
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.precio{
+    color: $verde;
+    font-weight: $bold;
+    font-size: 3rem;
 }
 
 .iconos-caracteristicas{
     display: flex;
+    justify-content: space-between;
 
     list-style: none;
-    padding: 0 3rem;
+    padding: 0 1rem;
     
-    justify-content: space-between;
+    max-width: 40rem;
+
+    li{
+        display: flex;
+        column-gap: 1rem;
+        justify-content: space-between;
+
+        p{
+            font-weight: bold;
+        }
+    }
 }
