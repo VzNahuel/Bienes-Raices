@@ -10,3 +10,18 @@
 .boton-verde{
     @include boton($verde);
 }
+
+.boton-verde-block{
+    @include boton($verde);
+    display: block;
+}
+
+.boton-rojo{
+    @include boton($rojo);
+}
+
+.boton-rojo-block{
+    @include boton($rojo);
+    display: block;
+    width: 100%;
+}
