@@ -1,5 +1,6 @@
 <?php
-    include "includes/config/databases.php";
+
+    require "includes/app.php";
 
     $id = $_GET["id"];
     $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -19,7 +20,7 @@
 
     $propiedad = mysqli_fetch_assoc($resultado);
 
-    require "includes/funciones.php";
+    
     incluirTemplate("header");
 ?>
 

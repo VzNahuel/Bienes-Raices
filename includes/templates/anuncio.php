@@ -1,11 +1,6 @@
 <?php
     // Realizar la conexion
 
-    /* 
-    Este archivo es llamado por "/index.php".
-    Por ello, la ruta del include sera relativa a este.
-    */
-    include("includes/config/databases.php");
     $db = conectarDB();
 
     // Realizar la consulta

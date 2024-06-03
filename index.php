@@ -1,5 +1,5 @@
 <?php
-    require "includes/funciones.php";
+    require "includes/app.php";
 
     incluirTemplate("header", $inicio = true);
 ?>
@@ -66,7 +66,7 @@
                 en contacto a la brevedad
             </p>
 
-            <a href="contacto.html" class="boton-amarillo">Contactanos</a>
+            <a href="contacto.php" class="boton-amarillo">Contactanos</a>
         </section>
 
         <div class="contenedor seccion seccion-inferior">
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="texto-entrada">
-                        <a href="entrada.html">
+                        <a href="entrada.php">
                             <h4>Terraza en el techo de tu casa</h4>
                             <p class="informacion-meta">
                                 Escrito el: <span>20/10/2022</span> por:
@@ -110,7 +110,7 @@
                     </div>
 
                     <div class="texto-entrada">
-                        <a href="entrada.html">
+                        <a href="entrada.php">
                             <h4>Guía para la decoracion de tu hogar</h4>
                             <p class="informacion-meta">
                                 Escrito el: <span>20/10/2022</span> por:

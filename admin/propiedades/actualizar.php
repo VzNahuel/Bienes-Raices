@@ -1,5 +1,13 @@
 <?php
 
+    require "../../includes/funciones.php";
+
+    $auth = estaAutenticado();
+
+    if( !$auth ){
+        header("Location: /");
+    }
+
     // Validar el ID como INT; Enviamos a "admin" si no es INT
     $id = $_GET["id"];
     $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -128,7 +136,6 @@
 
     }
 
-    require "../../includes/funciones.php";
     incluirTemplate("header");
 ?>
 

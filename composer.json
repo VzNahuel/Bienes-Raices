@@ -1,0 +1,17 @@
+{
+    "name": "nahuel/bienesraices",
+    "description": "Creando un proyecto con POO",
+    "type": "project",
+    "authors": [
+        {
+            "name": "VzNahuel",
+            "email": "nahuel.valdez.17@hotmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\" : "./classes"
+        }
+    }
+}
