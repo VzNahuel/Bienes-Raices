@@ -1,6 +1,6 @@
 <?php
 
-    require "../../includes/funciones.php";
+    require "../../includes/app.php";
 
     $auth = estaAutenticado();
 
@@ -17,7 +17,6 @@
     }
 
     // Base de Datos
-    require "../../includes/config/databases.php";
     $db = conectarDB();
 
     // Obtener los datos de la propiedad

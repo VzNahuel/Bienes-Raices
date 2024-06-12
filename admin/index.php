@@ -1,7 +1,7 @@
 <?php
 
     // Comprobamos que se permita el acceso
-    require "../includes/funciones.php";
+    require "../includes/app.php";
 
     $auth = estaAutenticado();
 
@@ -11,7 +11,6 @@
 
 
     // Importar la conexion
-    require "../includes/config/databases.php";
     $db = conectarDB();
 
     // Escribir el Query
