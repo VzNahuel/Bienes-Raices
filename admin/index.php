@@ -2,22 +2,15 @@
 
     // Comprobamos que se permita el acceso
     require "../includes/app.php";
-
-    $auth = estaAutenticado();
-
-    if( !$auth ){
-        header("Location: /");
-    }
+    estaAutenticado();
 
 
-    // Importar la conexion
-    $db = conectarDB();
+    use App\Propiedad;
 
-    // Escribir el Query
-    $query = "SELECT * FROM propiedades";
 
-    // Realizar la consulta
-    $resultadoConsulta = mysqli_query($db, $query);
+    // Implementar un metodo para obtener todas las propiedades
+    $propiedades = Propiedad::all();
+
 
     // Importar anuncio registrado
     $registrado = $_GET["registrado"] ?? null; // Si no existe, el default es null
@@ -93,25 +86,25 @@
 
         <tbody> <!-- Mostrar los resultados -->
 
-            <?php while( $propiedad = mysqli_fetch_assoc($resultadoConsulta) ){ ?>
+            <?php foreach( $propiedades as $propiedad ){ ?>
                 <tr>
-                    <td> <?php print( $propiedad["id"] ); ?> </td>
-                    <td> <?php print( $propiedad["titulo"] ); ?> </td>
+                    <td> <?php print( $propiedad->getId() ); ?> </td>
+                    <td> <?php print( $propiedad->getTitulo() ); ?> </td>
                     <td>
-                        <img src="/imagenes/<?php print( $propiedad["imagen"] ); ?>"
+                        <img src="/imagenes/<?php print( $propiedad->getImagen() ); ?>"
                         alt="imagen playa"
                         class="imagen-tabla">
                     </td>
-                    <td>$ <?php print( $propiedad["precio"] ); ?> </td>
+                    <td>$ <?php print( $propiedad->getPrecio() ); ?> </td>
                     <td>
-                        <a href="/admin/propiedades/actualizar.php?id=<?php print( $propiedad["id"] );?>"
+                        <a href="/admin/propiedades/actualizar.php?id=<?php print( $propiedad->getId() );?>"
                         class="boton-amarillo-block"
                         >
                             Actualizar
                         </a>
 
                         <form action="" method="POST" class="w-100">
-                            <input type="hidden" name="id" value="<?php print($propiedad["id"]); ?>">
+                            <input type="hidden" name="id" value="<?php print($propiedad->getId() ); ?>">
 
                             <input type="submit" value="Eliminar" class="boton-rojo-block">
                         </form>

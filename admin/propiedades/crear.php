@@ -15,21 +15,15 @@
     // Base de Datos
     $db = conectarDB();
 
-    // Consulta a la BD
+    // Crear una propiedad vacia
+    $propiedad = new Propiedad;
 
+    // Consulta a la BD
     $consulta = "SELECT * FROM vendedores";
     $resultado = mysqli_query($db, $consulta);
 
     // Arreglo de errores
     $errores = Propiedad::getErrores();
-
-    $titulo = "";
-    $precio = "";
-    $descripcion = "";
-    $habitaciones = "";
-    $wc = "";
-    $estacionamiento = "";
-    $vendedores_id = "";
 
     // Codigo ejecutado al presionar "Enviar"
     if ($_SERVER["REQUEST_METHOD"] === "POST")
@@ -65,7 +59,7 @@
             $imagen->save(DIRECTORIO_IMAGENES.$nombreImagen);
 
             // Guarda en DB
-            $resultado = $propiedad->guardarDB();
+            $resultado = $propiedad->crearDB();
 
             if($resultado){
                 // Redireccionar. NO debe haber HTML imprimido antes de redireccionar
@@ -101,17 +95,21 @@
 
             <label for="titulo">Titulo: </label>
             <input type="text" id="titulo" placeholder="Titulo Propiedad"
-            name="titulo" value="<?php print($titulo) ?>">
+            name="titulo"
+            value="<?php print( sanitizar( $propiedad->getTitulo() ) );?>">
 
             <label for="precio">Precio: </label>
             <input type="number" id="precio" placeholder="Precio"
-            name="precio" value="<?php print($precio) ?>">
+            name="precio"
+            value="<?php print( sanitizar( $propiedad->getPrecio() ) );?>">
 
             <label for="imagen">Imagen: </label>
             <input type="file" id="imagen" accept="image/jpeg, image/png" name="imagen">
 
             <label for="descripcion">Descripcion</label>
-            <textarea name="descripcion" id="descripcion"><?php print($descripcion) ?></textarea>
+            <textarea name="descripcion" id="descripcion">
+                <?php print( sanitizar( $propiedad->getDescripcion() ) );?>
+            </textarea>
         </fieldset>
 
         <fieldset>
@@ -119,36 +117,19 @@
 
             <label for="habitaciones">Habitaciones</label>
             <input type="number" id="habitaciones" placeholder="Ej: 3" min="1" max="9"
-            name="habitaciones" value="<?php print($habitaciones) ?>">
+            name="habitaciones" value="<?php print( sanitizar( $propiedad->getHabitaciones() ) );?>">
 
             <label for="wc">Baños</label>
             <input type="number" id="wc" name="wc" placeholder="Ej: 3" min="1" max="9"
-            value="<?php print($wc) ?>">
+            value="<?php print( sanitizar( $propiedad->getWc() ) );?>">
 
             <label for="estacionamiento">Estacionamiento</label>
             <input type="number" id="estacionamiento" placeholder="Ej: 3" min="1" max="9"
-            name="estacionamiento" value="<?php print($estacionamiento) ?>">
+            name="estacionamiento" value="<?php print( sanitizar($propiedad->getEstacionamiento()) );?>">
         </fieldset>
 
         <fieldset>
             <legend>Vendedor</legend>
-
-            <select name="vendedores_id" id="vendedores_id">
-                <option value="">-- Seleccione --</option>
-
-                <?php while($vendedor = mysqli_fetch_assoc($resultado)){ ?>
-                    
-                    <option
-                        <?php print( $vendedor["id"] == $vendedores_id ? "selected" : "" ); ?>
-
-                        value="<?php print($vendedor["id"]); ?>">
-                        <?php print($vendedor["nombre"] . " " . $vendedor["apellido"]); ?>
-                    </option>
-
-
-                <?php } ?>
-                
-            </select>
         </fieldset>
 
         <input type="submit" value="Crear Propiedad" class="boton boton-verde">

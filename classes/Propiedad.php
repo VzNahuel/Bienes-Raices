@@ -12,7 +12,7 @@ class Propiedad{
     private static $errores = [];
 
 
-    private $id;
+    public $id;
     private $titulo;
     private $precio;
     private $imagen;
@@ -34,7 +34,7 @@ class Propiedad{
         $this->wc = $args["wc"] ?? "";
         $this->estacionamiento = $args["estacionamiento"] ?? "";
         $this->creado = date("Y/m/d");
-        $this->vendedores_id = $args["vendedores_id"] ?? "";
+        $this->vendedores_id = $args["vendedores_id"] ?? 1;
     }
 
     // Hacemos la composicion de un objeto "$database"
@@ -42,7 +42,17 @@ class Propiedad{
         self::$db = $database;  // Asignamos el atributo con ese objeto
     }
 
-    public function guardarDB(){
+    public function guardar(){
+        if ( isset($this->id) ){
+            $resultado = $this->actualizarDB();
+
+            return $resultado;
+        }else{
+            $this->crearDB();
+        }
+    }
+
+    public function crearDB(){
         // Sanitizar los datos
         $atributos = $this->sanitizarDatos();
 
@@ -63,8 +73,39 @@ class Propiedad{
         return $resultado;
     }
 
+    public function actualizarDB(){
+        // Sanitizar los datos
+        $atributos = $this->sanitizarDatos();
+
+        $valores = [];
+
+        foreach( $atributos as $key => $value ){
+            $valores[] = "{$key} = '{$value}'";
+        }
+
+        $query = "UPDATE propiedades SET ";
+        $query = $query . join(', ', $valores);
+        $query = $query . " WHERE id = '" . self::$db->escape_string( $this->getId() ) . "' ";
+        $query = $query . " LIMIT 1 ";
+
+        $resultado = self::$db->query( $query );
+
+        return $resultado;
+    }
+
     public function setImagen($imagen){
-        // Agregar el nombre al objeto
+        // Codigo para actualizar imagenes
+        if( $this->id ){
+            // Comprobamos si hay una imagen agregada
+            $existeArchivo = file_exists(DIRECTORIO_IMAGENES . $this->imagen);
+
+            // Si la hay, borra la anterior
+            if ( $existeArchivo ){
+                unlink(DIRECTORIO_IMAGENES . $this->imagen);
+            }
+        }
+
+        // Agregar el nombre al objeto cuando se crea
         if($imagen){
             $this->imagen = $imagen;
         }
@@ -132,4 +173,102 @@ class Propiedad{
         return self::$errores;
     }
 
+    // Mostrar una propiedad por ID
+    public static function find($id){
+        $query = "SELECT * FROM propiedades WHERE id = '$id'";
+
+        $resultado = self::$db->query($query);
+
+        // $registro es un Arreglo Asoc.
+        $registro = $resultado->fetch_assoc();
+
+        $objeto = self::convertirObjeto($registro);
+
+        return $objeto;
+
+    }
+
+    // Listar todas las propiedades
+    public static function all(){
+        $query = "SELECT * FROM propiedades";
+
+        $resultado = self::$db->query($query);
+
+        $array = [];
+
+        while( $registro = $resultado->fetch_assoc() ){
+            $objeto = self::convertirObjeto($registro);
+
+            $array[] = $objeto;
+        }
+
+        // Liberar memoria
+        $resultado->free();
+
+        return $array;
+    }
+
+    private static function convertirObjeto($registro){
+        $objeto = new Propiedad();
+
+        foreach( $registro as $key => $value ){
+            if(property_exists($objeto, $key)){
+                $objeto->$key = $value;
+            }
+        }
+
+        
+        return $objeto;
+    }
+
+    // Sincroniza los datos en POST con el objeto Propiedad
+    public function sincronizarObjeto( $args = [] ){
+        foreach( $args as $key => $value ){
+            if( property_exists($this, $key) && !is_null($value) ){
+                $this->$key = $value;
+            }
+        }
+    }
+
+
+    /** GETTERS **/
+    public function getId(){
+        return $this->id;
+    }
+
+    public function getTitulo(){
+        return $this->titulo;
+    }
+
+    public function getPrecio(){
+        return $this->precio;
+    }
+
+    public function getImagen(){
+        return $this->imagen;
+    }
+
+    public function getDescripcion(){
+        return $this->descripcion;
+    }
+
+    public function getHabitaciones(){
+        return $this->habitaciones;
+    }
+
+    public function getWc(){
+        return $this->wc;
+    }
+
+    public function getEstacionamiento(){
+        return $this->estacionamiento;
+    }
+
+    public function getCreado(){
+        return $this->creado;
+    }
+
+    public function getVendedores_id(){
+        return $this->vendedores_id;
+    }
 }

@@ -26,3 +26,10 @@ function iniciarDebug($var){
 
     exit;
 }
+
+// Sanitizar html
+function sanitizar($html) : string{
+    $s = htmlspecialchars($html);
+
+    return $s;
+}
