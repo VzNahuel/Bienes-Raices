@@ -1,30 +1,33 @@
 <?php
-    // Realizar la conexion
+    use App\Propiedad;
 
-    $db = conectarDB();
+    // Elegimos cuantas propiedades mostrar en cada pagina
 
-    // Realizar la consulta
-    $query = "SELECT * FROM propiedades LIMIT $limite";
-    $resultado = mysqli_query($db, $query);
-
+    if ($_SERVER["SCRIPT_NAME"] === "/anuncio.php"){
+        // Traer todo
+        $propiedades = Propiedad::all();
+    }else{
+        // Traer 3
+        $propiedades = Propiedad::getN(3);
+    }
 
 ?>
 
-<?php while($propiedad = mysqli_fetch_assoc($resultado)){ ?>
+<?php foreach($propiedades as $propiedad){ ?>
     <div class="anuncio">
 
-        <img src="/imagenes/<?php print($propiedad["imagen"]); ?>"
+        <img src="/imagenes/<?php print($propiedad->getImagen()); ?>"
         alt="anuncio"
         loading="lazy">
         
 
         <div class="contenido-anuncio">
-            <h3><?php print($propiedad["titulo"]); ?></h3>
+            <h3><?php print($propiedad->getTitulo()); ?></h3>
             <p>
-                <?php print($propiedad["descripcion"]); ?>
+                <?php print($propiedad->getDescripcion()); ?>
             </p>
             <p class="precio">
-                <?php print($propiedad["precio"]); ?>
+                <?php print($propiedad->getPrecio()); ?>
             </p>
 
             <ul class="iconos-caracteristicas">
@@ -33,7 +36,7 @@
                     alt="icono wc" loading="lazy">
 
                     <p>
-                        <?php print($propiedad["wc"]); ?>
+                        <?php print($propiedad->getWc()); ?>
                     </p>
                 </li>
 
@@ -42,7 +45,7 @@
                     alt="icono estacionamiento" loading="lazy">
 
                     <p>
-                        <?php print($propiedad["estacionamiento"]); ?>
+                        <?php print($propiedad->getEstacionamiento()); ?>
                     </p>
                 </li>
 
@@ -51,20 +54,14 @@
                     alt="icono dormitorio" loading="lazy">
 
                     <p>
-                        <?php print($propiedad["habitaciones"]); ?>
+                        <?php print($propiedad->getHabitaciones()); ?>
                     </p>
                 </li>
             </ul>
 
-            <a href="anuncio.php?id=<?php print($propiedad["id"]); ?>" class="boton-amarillo-block">
+            <a href="anuncio.php?id=<?php print($propiedad->getId()); ?>" class="boton-amarillo-block">
                 Ver Propiedad
             </a>
         </div> <!-- Contenido -->
     </div> <!-- Anuncio -->
 <?php } ?>
-    
-
-<?php
-    // Cerrar la conexion
-    mysqli_close($db);
-?>

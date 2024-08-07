@@ -2,52 +2,32 @@
 
 namespace App;
 
-class Propiedad{
+class ActiveRecord{
+    
 
     // Definir DB
     private static $db;
-    private static $columnasDB = ["id", "titulo", "precio", "imagen", "descripcion", "habitaciones", "wc", "estacionamiento", "creado", "vendedores_id"];
+    protected static $columnasDB = [];
+
+    private static $nombreTabla = "";
+
 
     // Errores
-    private static $errores = [];
-
-
-    public $id;
-    private $titulo;
-    private $precio;
-    private $imagen;
-    private $descripcion;
-    private $habitaciones;
-    private $wc;
-    private $estacionamiento;
-    private $creado;
-    private $vendedores_id;
-
-    public function __construct($args = [])
-    {
-        $this->id = $args["id"] ?? "";
-        $this->titulo = $args["titulo"] ?? "";
-        $this->precio = $args["precio"] ?? "";
-        $this->imagen = $args["imagen"] ?? "";
-        $this->descripcion = $args["descripcion"] ?? "";
-        $this->habitaciones = $args["habitaciones"] ?? "";
-        $this->wc = $args["wc"] ?? "";
-        $this->estacionamiento = $args["estacionamiento"] ?? "";
-        $this->creado = date("Y/m/d");
-        $this->vendedores_id = $args["vendedores_id"] ?? 1;
-    }
+    protected static $errores = [];
 
     // Hacemos la composicion de un objeto "$database"
     public static function setDB($database){
         self::$db = $database;  // Asignamos el atributo con ese objeto
     }
 
+    // Esta funcion se utiliza SI O SI en updates.
+    // Para crear, se llama directamente a 'crearDB'.
     public function guardar(){
-        if ( isset($this->id) ){
+        if ( isset($this->id) ){ // Si tiene ID, actualiza
             $resultado = $this->actualizarDB();
 
             return $resultado;
-        }else{
+        }else{                   // Caso contrario, crea
             $this->crearDB();
         }
     }
@@ -62,11 +42,13 @@ class Propiedad{
         $stringValues = join("', '", array_values($atributos));
 
         // Insert en propiedades
-        $query = "INSERT INTO propiedades ( ";
+        $query = "INSERT INTO " . static::$nombreTabla . " ( ";
         $query = $query . $stringColumnas;
         $query = $query . " ) VALUES ( '";
         $query = $query . $stringValues;
         $query = $query . "' )";
+
+        
 
         $resultado = self::$db->query($query);
 
@@ -83,7 +65,7 @@ class Propiedad{
             $valores[] = "{$key} = '{$value}'";
         }
 
-        $query = "UPDATE propiedades SET ";
+        $query = "UPDATE " . static::$nombreTabla . " SET ";
         $query = $query . join(', ', $valores);
         $query = $query . " WHERE id = '" . self::$db->escape_string( $this->getId() ) . "' ";
         $query = $query . " LIMIT 1 ";
@@ -93,16 +75,18 @@ class Propiedad{
         return $resultado;
     }
 
+    public function eliminarDB(){
+        $query = "DELETE FROM " . static::$nombreTabla . " WHERE id = '" . self::$db->escape_string( $this->getId() ) . "' LIMIT 1";
+
+        $resultado = self::$db->query( $query );
+
+        return $resultado;
+    }
+
     public function setImagen($imagen){
         // Codigo para actualizar imagenes
         if( $this->id ){
-            // Comprobamos si hay una imagen agregada
-            $existeArchivo = file_exists(DIRECTORIO_IMAGENES . $this->imagen);
-
-            // Si la hay, borra la anterior
-            if ( $existeArchivo ){
-                unlink(DIRECTORIO_IMAGENES . $this->imagen);
-            }
+            $this->borrarImagen();
         }
 
         // Agregar el nombre al objeto cuando se crea
@@ -111,10 +95,20 @@ class Propiedad{
         }
     }
 
+    public function borrarImagen(){
+        // Comprobamos si hay una imagen agregada
+        $existeArchivo = file_exists(DIRECTORIO_IMAGENES . $this->imagen);
+
+        // Si la hay, borra la anterior
+        if ( $existeArchivo ){
+            unlink(DIRECTORIO_IMAGENES . $this->imagen);
+        }
+    }
+
     public function definirAtributos(){
         $atributos = [];
 
-        foreach(self::$columnasDB as $columna){
+        foreach(static::$columnasDB as $columna){
             
             if ($columna === "id") continue; // Salteamos la agregacion de "id"
 
@@ -139,50 +133,27 @@ class Propiedad{
 
     // Validacion
     public static function getErrores(){
-        return self::$errores;
+        return static::$errores;
     }
 
     public function validar(){
-        if(!$this->titulo){
-            self::$errores[] = "El titulo es obligatorio";
-        }
         
-        if(!$this->precio){
-            self::$errores[] = "El precio es obligatorio";
-        }
-        if(!$this->descripcion){
-            self::$errores[] = "La descripcion es obligatoria";
-        }
-        if(!$this->habitaciones){
-            self::$errores[] = "La cantidad de habitaciones es obligatoria";
-        }
-        if(!$this->wc){
-            self::$errores[] = "La cantidad de wc es obligatoria";
-        }
-        if(!$this->estacionamiento){
-            self::$errores[] = "La cantidad de lugares de estacionamiento es obligatoria";
-        }
-        if(!$this->vendedores_id){
-            self::$errores[] = "Debe seleccionar un vendedor";
-        }
-
-        if(!$this->imagen){
-            self::$errores[] = "La imagen es obligatoria";
-        }
+        // Limpiar el arreglo antes de validar
+        static::$errores = [];
         
-        return self::$errores;
+        return static::$errores;
     }
 
     // Mostrar una propiedad por ID
     public static function find($id){
-        $query = "SELECT * FROM propiedades WHERE id = '$id'";
+        $query = "SELECT * FROM " . static::$nombreTabla . " WHERE id = '$id'";
 
         $resultado = self::$db->query($query);
 
         // $registro es un Arreglo Asoc.
         $registro = $resultado->fetch_assoc();
 
-        $objeto = self::convertirObjeto($registro);
+        $objeto = static::convertirObjeto($registro);
 
         return $objeto;
 
@@ -190,14 +161,14 @@ class Propiedad{
 
     // Listar todas las propiedades
     public static function all(){
-        $query = "SELECT * FROM propiedades";
+        $query = "SELECT * FROM " . static::$nombreTabla;
 
         $resultado = self::$db->query($query);
 
         $array = [];
 
         while( $registro = $resultado->fetch_assoc() ){
-            $objeto = self::convertirObjeto($registro);
+            $objeto = static::convertirObjeto($registro);
 
             $array[] = $objeto;
         }
@@ -208,11 +179,33 @@ class Propiedad{
         return $array;
     }
 
+    // Obtiene un determinado Nº de registros
+    public static function getN($n){
+        $query = "SELECT * FROM " . static::$nombreTabla . " LIMIT " . $n;
+
+        $resultado = self::$db->query($query);
+
+        $array = [];
+
+        while( $registro = $resultado->fetch_assoc() ){
+            $objeto = static::convertirObjeto($registro);
+
+            $array[] = $objeto;
+        }
+
+        // Liberar memoria
+        $resultado->free();
+
+        return $array;
+    }
+
+
     private static function convertirObjeto($registro){
-        $objeto = new Propiedad();
+        $objeto = new static;
 
         foreach( $registro as $key => $value ){
             if(property_exists($objeto, $key)){
+
                 $objeto->$key = $value;
             }
         }
@@ -230,45 +223,4 @@ class Propiedad{
         }
     }
 
-
-    /** GETTERS **/
-    public function getId(){
-        return $this->id;
-    }
-
-    public function getTitulo(){
-        return $this->titulo;
-    }
-
-    public function getPrecio(){
-        return $this->precio;
-    }
-
-    public function getImagen(){
-        return $this->imagen;
-    }
-
-    public function getDescripcion(){
-        return $this->descripcion;
-    }
-
-    public function getHabitaciones(){
-        return $this->habitaciones;
-    }
-
-    public function getWc(){
-        return $this->wc;
-    }
-
-    public function getEstacionamiento(){
-        return $this->estacionamiento;
-    }
-
-    public function getCreado(){
-        return $this->creado;
-    }
-
-    public function getVendedores_id(){
-        return $this->vendedores_id;
-    }
 }

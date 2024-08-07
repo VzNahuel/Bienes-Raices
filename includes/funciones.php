@@ -33,3 +33,33 @@ function sanitizar($html) : string{
 
     return $s;
 }
+
+
+// Validar tipo de contenido
+function validarTipoContenido($tipo){
+    $tipos = ["propiedad", "vendedor"];
+
+    return in_array($tipo, $tipos); // Se encuentra 'tipo' en 'tipos'?
+}
+
+// Mostrar alertas
+function mostrarAlertas($status = 0){
+    $mensaje = "";
+
+    switch($status){
+        case 1:
+            $mensaje = "Registrado Correctamente";
+            break;
+        case 2:
+            $mensaje = "Actualizado Correctamente";
+            break;
+        case 3:
+            $mensaje = "Eliminado Correctamente";
+            break;
+        default:
+            $mensaje = false;
+            break;
+    }
+
+    return $mensaje;
+}
