@@ -3,7 +3,8 @@
 
 define("TEMPLATES_URL", __DIR__ . "/templates");
 define("FUNCIONES_URL", __DIR__ . "funciones.php");
-define("DIRECTORIO_IMAGENES", __DIR__ . "/../imagenes/");
+
+define("DIRECTORIO_IMAGENES", $_SERVER["DOCUMENT_ROOT"]);
 
 function incluirTemplate( string $nombre, bool $inicio = false){
     include TEMPLATES_URL . "/${nombre}.php";
@@ -62,4 +63,16 @@ function mostrarAlertas($status = 0){
     }
 
     return $mensaje;
+}
+
+function validarId(string $url){
+    // Validar el ID como INT; Enviamos a "admin" si no es INT
+    $id = $_GET["id"];
+    $id = filter_var($id, FILTER_VALIDATE_INT);
+
+    if(!$id){
+        header("Location: ${url}");
+    }
+
+    return $id;
 }

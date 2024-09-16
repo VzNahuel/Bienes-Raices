@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Model;
 
 class Propiedad extends ActiveRecord{
     protected static $columnasDB = ["id", "titulo", "precio", "imagen", "descripcion", "habitaciones", "wc", "estacionamiento", "creado", "vendedores_id"];
