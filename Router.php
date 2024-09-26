@@ -16,6 +16,21 @@ class Router{
     }
 
     public function comprobarRutas(){
+        session_start();
+
+        $auth = $_SESSION["login"] ?? null;
+
+        // Arreglo de rutas protegidas
+        $rutas_protegidas = [
+            "/admin",
+            "/propiedades/crear",
+            "/propiedades/acutalizar",
+            "/propiedades/eliminar",
+            "/vendedores/crear",
+            "/vendedores/actualizar",
+            "/vendedores/eliminar",
+        ];
+
         $urlActual = $_SERVER["PATH_INFO"] ?? "/";
 
         $metodo = $_SERVER["REQUEST_METHOD"];
@@ -24,6 +39,12 @@ class Router{
             $fn = $this->rutasGET[$urlActual] ?? null;
         }else{
             $fn = $this->rutasPOST[$urlActual] ?? null;
+        }
+
+        // Proteger las rutas
+        if(in_array($urlActual, $rutas_protegidas) && !$auth){
+            // Si entra a una ruta protegida sin autenticar...
+            header("Location: /");
         }
 
         if($fn){
@@ -41,12 +62,12 @@ class Router{
             $$key = $value;
         }
 
-        ob_start();
+        ob_start(); // Almacena el buffer en memoria
 
-        include __DIR__ . "/views/$view.php";
+        include_once __DIR__ . "/views/$view.php";
 
-        $contenido = ob_get_clean();
+        $contenido = ob_get_clean();    // Limpia el buffer
 
-        include __DIR__ . "/views/layout.php";
+        include_once __DIR__ . "/views/layout.php";
     }
 }

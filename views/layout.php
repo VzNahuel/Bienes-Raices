@@ -15,7 +15,7 @@
     <header class="header <?php print $inicio? "inicio" : ""; ?> ">
         <div class="contenedor contenido-header">
             <div class="barra">
-                <a href="/index.php">
+                <a href="/">
                     <img src="/build/img/logo.svg" alt="Logotipo de bienes raices">
                 </a>
 
@@ -28,10 +28,14 @@
                     alt="Icono dark mode">
 
                     <nav class="navegacion">
-                        <a href="nosotros.php">Nosotros</a>
-                        <a href="anuncios.php">Anuncios</a>
-                        <a href="blog.php">Blog</a>
-                        <a href="contacto.php">Contacto</a>
+                        <a href="/nosotros">Nosotros</a>
+                        <a href="/propiedades">Anuncios</a>
+                        <a href="/blog">Blog</a>
+                        <a href="/contacto">Contacto</a>
+
+                        <?php if($auth){ ?>
+                            <a href="/logout">Cerrar Sesion</a>
+                        <?php } ?>
                     </nav>
                 </div>
 
@@ -56,10 +60,14 @@
     <footer class="footer seccion">
         <div class="contenedor contenido-footer">
             <nav class="navegacion">
-                <a href="nosotros.php">Nosotros</a>
-                <a href="anuncios.php">Anuncios</a>
-                <a href="blog.php">Blog</a>
-                <a href="contacto.php">Contacto</a>
+                <a href="/nosotros">Nosotros</a>
+                <a href="/propiedades">Anuncios</a>
+                <a href="/blog">Blog</a>
+                <a href="/contacto">Contacto</a>
+
+                <?php if($auth){ ?>
+                    <a href="/logout">Cerrar Sesion</a>
+                <?php } ?>
             </nav>
         </div>
 

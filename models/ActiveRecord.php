@@ -6,7 +6,7 @@ class ActiveRecord{
     
 
     // Definir DB
-    private static $db;
+    protected static $db;
     protected static $columnasDB = [];
 
     private static $nombreTabla = "";

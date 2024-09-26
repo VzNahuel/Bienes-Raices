@@ -15,11 +15,17 @@ class PropiedadController{
 
         $propiedades = Propiedad::all();
 
+        $vendedores = Vendedor::all();
+
         $status = $_GET["status"] ?? NULL;
+
+        $auth = $_SESSION["login"];
 
         $router->render("propiedades/admin",[
             "propiedades" => $propiedades,
-            "status" => $status
+            "status" => $status,
+            "vendedores" => $vendedores,
+            "auth" => $auth
         ]);
     }
 
@@ -92,9 +98,91 @@ class PropiedadController{
 
         $errores = Propiedad::getErrores();
 
+        $vendedores = Vendedor::all();
+
+        // Codigo para metodo POST
+        if ($_SERVER["REQUEST_METHOD"] === "POST")
+        {
+            // Asginamos los datos en un arreglo
+            $args = [];
+
+            $args["titulo"] = $_POST["titulo"] ?? null ;
+            $args["precio"] = $_POST["precio"] ?? null ;
+            $args["descripcion"] = $_POST["descripcion"] ?? null ;
+            $args["habitaciones"] = $_POST["habitaciones"] ?? null ;
+            $args["wc"] = $_POST["wc"] ?? null ;
+            $args["estacionamiento"] = $_POST["estacionamiento"] ?? null ;
+            $args["vendedores_id"] = $_POST["vendedores_id"] ?? null ;
+
+            // Comparamos el POST con el Objeto
+            $propiedad->sincronizarObjeto($args);
+
+            // Validacion
+            // NOTA: No deberia validar despues de agregar la imagen???
+            $errores = $propiedad->validar();
+
+
+            // Subida de archivos
+
+            // Generar un nombre unico
+            $nombreImagen = md5( uniqid( rand(), true ) ) . ".jpg";
+
+            if($_FILES["imagen"]["tmp_name"]){ // Si la imagen se agrego al formulario...
+                // Usamos fit en la imagen
+                $imagen = ImageMan::make($_FILES["imagen"]["tmp_name"])->fit(800, 600);
+                
+                // Definimos el nombre en el objeto "Propiedad"
+                $propiedad->setImagen($nombreImagen);
+            }
+
+            if(empty($errores)){
+                if($_FILES["imagen"]["tmp_name"]){
+                    $imagen->save(DIRECTORIO_IMAGENES . $nombreImagen);
+                }
+                
+                $resultado = $propiedad->guardar();
+            
+                if($resultado){
+                    // Redireccionar. NO debe haber HTML imprimido antes de redireccionar
+                    header("Location: /admin?status=2");
+                }
+            }
+
+        }
+
         $router->render("/propiedades/actualizar", [
             "propiedad" => $propiedad,
-            "errores" => $errores
+            "errores" => $errores,
+            "vendedores" => $vendedores
         ]);
+    }
+
+    public static function eliminar(){
+        if($_SERVER["REQUEST_METHOD"] === "POST"){
+            $id = $_POST["id"];
+            $id = filter_var($id, FILTER_VALIDATE_INT);
+
+            if($id){
+
+                $tipo = $_POST["tipo"];
+
+                // Validamos
+                if(validarTipoContenido($tipo)){
+                    
+                    // Compara lo que se borrara
+                    if($tipo === "propiedad"){
+                        $propiedad = Propiedad::find($id);
+                        $resultado = $propiedad->eliminarDB();
+
+                        if($resultado){
+                            $propiedad->borrarImagen();
+
+                            header("Location: /admin?status=3");
+                        }
+
+                    }
+                }
+            }
+        }
     }
 }
